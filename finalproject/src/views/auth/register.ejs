@@ -1,1 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register</title>
+    <link rel="stylesheet" href="/public/css/register.css">
+</head>
+<body>
+    <div class="background-container">
+        <video autoplay loop muted playsinline class="background-video">
+            <source src="/public/videos/index_background.mp4" type="video/mp4">
+            Your browser does not support the video tag.
+        </video>
 
+        <div class="form-container">
+            <h2>Register</h2>
+            <form action="/auth/register" method="POST">
+                <input type="text" name="username" placeholder="Enter your username" required>
+                <input type="password" name="password" placeholder="Enter your password" required>
+                <select name="status" required>
+                    <option value="User" selected>User</option>
+                </select>
+                <button type="submit" class="btn">Register</button>
+            </form>
+            <p>Already have an account? <a href="/auth/login">Login here.</a></p>
+        </div>
+
+        <button class="mute-button" onclick="toggleMute()">
+            <i class="fas fa-volume-up"></i>
+        </button>
+    </div>
+    <script src="/public/js/index.js"></script>
+</body>
+</html>
