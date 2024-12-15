@@ -1,171 +1,86 @@
-/* 全局样式 */
-body {
-    margin: 0;
-    padding: 0;
-    font-family: Arial, sans-serif;
-    background: url('/public/images/basic_background.jpg') no-repeat center center fixed;
-    background-size: cover;
-    color: white;
-    display: flex;
-    min-height: 100vh;
-}
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Dashboard</title>
+    <link rel="stylesheet" href="/public/css/userPage.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <!-- 侧边栏切换按钮 -->
+    <button id="sidebar-toggle"><span class="arrow">❯</span></button>
 
-/* 侧边栏切换按钮样式 */
-#sidebar-toggle {
-    position: fixed;
-    left: 200px;
-    top: 50%;
-    transform: translateY(-50%);
-    width: 24px;
-    height: 40px;
-    background-color: rgba(0, 0, 0, 0.5);
-    border: none;
-    border-radius: 0 4px 4px 0;
-    cursor: pointer;
-    z-index: 1000;
-    transition: left 0.3s ease;
-    padding: 0;
-}
+    <!-- 侧边栏 -->
+    <div class="sidebar">
+        <!-- 天气查询功能 -->
+        <div class="sidebar-section">
+            <h3>天气查询</h3>
+            <input type="text" id="city-input" placeholder="请输入城市名称..." />
+            <button id="city-button">查询</button>
+        </div>
 
-#sidebar-toggle .arrow {
-    color: white;
-    font-size: 16px;
-    transition: transform 0.3s ease;
-}
+        <!-- 笔记管理功能 -->
+        <div class="sidebar-section">
+            <h3>笔记管理</h3>
+            <button id="open-note-modal">添加笔记</button>
+            <input type="text" id="delete-note-id" placeholder="输入笔记ID以删除" />
+            <button id="delete-note-button">删除笔记</button>
+        </div>
 
-body.sidebar-closed #sidebar-toggle {
-    left: 0;
-}
+        <!-- 图片管理功能 -->
+        <div class="sidebar-section">
+            <h3>图片管理</h3>
+            <button id="open-add-image-modal">添加图片</button>
+            <input type="text" id="image-id-input" placeholder="输入图片ID以删除" />
+            <button id="delete-image-button">删除图片</button>
+        </div>
 
-body.sidebar-closed #sidebar-toggle .arrow {
-    transform: rotate(180deg);
-}
+        <!-- 背景选择功能 -->
+        <div class="sidebar-section">
+            <h3>背景选择</h3>
+            <select id="background-select">
+                <option value="paper">纸张</option>
+                <option value="custom1">自定义背景1</option>
+                <option value="custom2">自定义背景2</option>
+            </select>
+        </div>
+    </div>
 
-/* 侧边栏样式 */
-.sidebar {
-    width: 200px;
-    background-color: rgba(0, 0, 0, 0.5);
-    padding: 20px;
-    box-sizing: border-box;
-    height: 100vh;
-    position: fixed;
-    left: 0;
-    transition: left 0.3s ease;
-}
+    <!-- 主内容区域 -->
+    <div class="main-content">
+        <div id="time">加载时间...</div>
+        <div id="weather">加载天气...</div>
+        <div id="llm-section">
+            <input type="text" id="llm-input" placeholder="向我提问..." />
+            <button id="llm-button">发送</button>
+            <div id="llm-response">你的回答将显示在这里...</div>
+        </div>
+    </div>
 
-body.sidebar-closed .sidebar {
-    left: -200px;
-}
+    <!-- 添加笔记模态框 -->
+    <div id="note-modal" class="modal hidden">
+        <div class="modal-content">
+            <span id="close-note-modal" class="close-button">×</span>
+            <h3>添加笔记</h3>
+            <textarea id="note-text" placeholder="在此输入你的笔记..."></textarea>
+            <button id="save-note-button">保存</button>
+        </div>
+    </div>
 
-.sidebar-section {
-    margin-bottom: 20px;
-}
+    <!-- 添加图片模态框 -->
+    <div id="add-image-modal" class="modal hidden">
+        <div class="modal-content">
+            <span id="close-add-image-modal" class="close-button">×</span>
+            <h3>添加图片</h3>
+            <div id="image-drop-zone" class="drop-zone">
+                拖动图片到此处或点击选择文件
+                <input type="file" id="image-upload" hidden />
+            </div>
+            <button id="upload-image-button">上传</button>
+        </div>
+    </div>
 
-.sidebar-section h3 {
-    margin: 0 0 10px 0;
-    font-size: 18px;
-    color: rgba(255, 255, 255, 0.9);
-}
-
-/* 输入框样式 */
-input, select, textarea {
-    padding: 8px;
-    border: 1px solid rgba(255, 255, 255, 0.3);
-    border-radius: 4px;
-    background-color: rgba(255, 255, 255, 0.1);
-    color: white;
-    width: 100%;
-}
-
-/* 按钮样式 */
-button {
-    padding: 8px 15px;
-    font-size: 14px;
-    background-color: rgba(76, 175, 80, 0.8);
-    color: white;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    width: 100%;
-}
-
-button:hover {
-    background-color: rgba(69, 160, 73, 0.8);
-}
-
-/* 主内容样式 */
-.main-content {
-    flex: 1;
-    margin-left: 200px;
-    padding: 20px;
-    text-align: center;
-    transition: margin-left 0.3s ease;
-}
-
-body.sidebar-closed .main-content {
-    margin-left: 0;
-}
-
-#time {
-    font-size: 48px;
-    font-weight: bold;
-    margin-top: 30px;
-    text-shadow: 2px 2px 6px rgba(0, 0, 0, 0.7);
-    opacity: 0.8;
-}
-
-#weather {
-    font-size: 24px;
-    margin-top: 15px;
-    text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.5);
-    opacity: 0.8;
-}
-
-/* 模态框样式 */
-.modal {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.6);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 1000;
-}
-
-.modal.hidden {
-    display: none;
-}
-
-.modal-content {
-    background-color: #ffffff;
-    padding: 20px;
-    border-radius: 8px;
-    width: 300px;
-    text-align: center;
-    color: black;
-}
-
-.close-button {
-    float: right;
-    font-size: 20px;
-    font-weight: bold;
-    cursor: pointer;
-}
-
-#note-list {
-    margin-top: 20px;
-    max-height: 200px;
-    overflow-y: auto;
-}
-
-.note-item {
-    padding: 10px;
-    margin-bottom: 10px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    background-color: #f9f9f9;
-    text-align: left;
-}
+    <script src="/public/js/userPage.js"></script>
+</body>
+</html>
