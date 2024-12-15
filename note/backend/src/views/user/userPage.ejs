@@ -23,6 +23,7 @@
                 <button id="city-button">Search</button>
             </div>
         </div>
+        <!-- 笔记部分 -->
         <div class="sidebar-section">
             <h3>Note</h3>
             <button id="open-note-modal">Open Notes</button>
@@ -36,9 +37,14 @@
                 <option value="custom2">Custom 2</option>
             </select>
         </div>
-        
+        <!-- 图片管理 -->
+        <div class="sidebar-section">
+            <h3>Images</h3>
+            <button id="open-add-image-modal">Add Image</button>
+            <button id="open-delete-image-modal">Delete Image</button>
+        </div>
     </div>
-    
+
     <!-- 主要内容区域 -->
     <div class="main-content">
         <div id="time">Loading time...</div>
@@ -49,18 +55,27 @@
             <div id="llm-response">Your response will appear here...</div>
         </div>
     </div>
-    <div id="note-modal" class="modal hidden">
-    <div class="modal-content">
-        <span id="close-note-modal" class="close-button">×</span>
-        <h3>Add Note</h3>
-        <input type="date" id="note-date" />
-        <textarea id="note-text" placeholder="Write your note here..."></textarea>
-        <button id="save-note-button">Save Note</button>
-        <div id="note-list">
-            <!-- 笔记列表 -->
+
+    <!-- 添加图片弹窗 -->
+    <div id="add-image-modal" class="modal hidden">
+        <div class="modal-content">
+            <span id="close-add-image-modal" class="close-button">×</span>
+            <h3>Add Image</h3>
+            <input type="file" id="image-upload" accept="image/*" />
+            <button id="upload-image-button">Upload</button>
         </div>
     </div>
-</div>
+
+    <!-- 删除图片弹窗 -->
+    <div id="delete-image-modal" class="modal hidden">
+        <div class="modal-content">
+            <span id="close-delete-image-modal" class="close-button">×</span>
+            <h3>Delete Image</h3>
+            <input type="text" id="image-id-input" placeholder="Enter Image ID..." />
+            <button id="delete-image-button">Delete</button>
+        </div>
+    </div>
+
     <script src="/public/js/userPage.js"></script>
 </body>
 </html>
