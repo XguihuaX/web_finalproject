@@ -48,9 +48,9 @@ app.use("/api/admin", adminRoutes);
 
 // 路由配置（前端页面）
 app.use("/", indexRoutes); // 首页
-app.use("/auth", authPageRoutes); // 登录/注册页面
-app.use("/user", userPageRoutes); // 用户页面
-app.use("/admin", adminPageRoutes); // 管理员页面
+app.use("/auth", authPage); // 登录/注册页面
+app.use("/user", userPage); // 用户页面
+app.use("/admin", adminPage); // 管理员页面
 
 // 错误处理中间件
 app.use((err, _req, res, _next) => {
