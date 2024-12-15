@@ -1,12 +1,21 @@
 const User = require("../models/user.js");
 const jwtUtils = require("../utils/jwt.js");
 
+tolowerCase = (status) => {
+  if (status === "User"){
+    return "user";
+  } else if (status === "Administrator"){
+    return "admin";
+  } else {
+    return null;
+  }
+}
 exports.register = async (req, res) => {
   try {
-    const { username, password, status } = req.body;
-
-    // 验证status字段是否合法
-    if (status && !["admin", "user"].includes(status)) {
+    let { username, password, status } = req.body;
+    console.log(req.body);
+    status = tolowerCase(status);
+    if (!status in ["user", "admin"]){
       return res.status(400).json({ message: "无效的用户状态" });
     }
 
