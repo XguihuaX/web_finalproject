@@ -1,22 +1,22 @@
-// 时间显示更新
+// 时间更新功能
 function updateTime() {
     const timeElement = document.getElementById('time');
     const now = new Date();
     const hours = now.getHours().toString().padStart(2, '0');
     const minutes = now.getMinutes().toString().padStart(2, '0');
-    const month = now.toLocaleString('en-US', { month: 'long' });
+    const month = now.toLocaleString('zh-CN', { month: 'long' });
     const day = now.getDate();
     timeElement.textContent = `${hours}:${minutes} - ${month} ${day}`;
 }
 setInterval(updateTime, 60000);
 updateTime();
 
-// 背景切换
+// 背景选择功能
 document.getElementById('background-select').addEventListener('change', function (e) {
     const backgrounds = {
         'paper': '/public/images/basic_background.jpg',
-        'custom1': 'YOUR_CUSTOM_BACKGROUND_1_URL',
-        'custom2': 'YOUR_CUSTOM_BACKGROUND_2_URL'
+        'custom1': '/public/images/custom_background_1.jpg',
+        'custom2': '/public/images/custom_background_2.jpg'
     };
     const selectedBackground = backgrounds[e.target.value];
     if (selectedBackground) {
@@ -24,73 +24,39 @@ document.getElementById('background-select').addEventListener('change', function
     }
 });
 
-// 天气 API 查询
-async function getWeatherByCity(city) {
-    const apiKey = 'YOUR_OPENWEATHER_API_KEY';
+// 侧边栏切换功能
+document.getElementById('sidebar-toggle').addEventListener('click', () => {
+    document.body.classList.toggle('sidebar-closed');
+});
+
+// 天气查询功能
+document.getElementById('city-button').addEventListener('click', async () => {
+    const city = document.getElementById('city-input').value.trim();
+    if (!city) return alert('请输入城市名称！');
     try {
-        const response = await fetch(`https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKey}&units=metric`);
-        if (!response.ok) throw new Error('Weather query failed.');
+        const response = await fetch(`https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=YOUR_API_KEY&units=metric`);
+        if (!response.ok) throw new Error('天气查询失败！');
         const data = await response.json();
         document.getElementById('weather').textContent = `${data.name}: ${data.weather[0].description}, ${data.main.temp}°C`;
     } catch (error) {
+        document.getElementById('weather').textContent = '无法获取天气。';
         console.error(error);
-        document.getElementById('weather').textContent = 'Unable to fetch weather.';
     }
-}
-document.getElementById('city-button').addEventListener('click', () => {
-    const city = document.getElementById('city-input').value.trim();
-    if (city) getWeatherByCity(city);
 });
 
-// 显示/隐藏弹窗
+// 模态框显示/隐藏功能
 function toggleModal(modalId, action) {
     document.getElementById(modalId).classList[action]('hidden');
 }
 
-// 笔记操作
-async function renderNotes() {
-    try {
-        const response = await fetch('/api/user/notes', {
-            headers: {
-                Authorization: `Bearer ${localStorage.getItem('token')}`,
-            },
-        });
-        if (!response.ok) throw new Error('Failed to fetch notes.');
+// 笔记管理功能
+document.getElementById('open-note-modal').addEventListener('click', () => toggleModal('note-modal', 'remove'));
+document.getElementById('close-note-modal').addEventListener('click', () => toggleModal('note-modal', 'add'));
 
-        const notes = await response.json();
-        const noteListContainer = document.getElementById('note-list');
-        noteListContainer.innerHTML = ''; // 清空旧笔记
-
-        notes.forEach(note => {
-            const noteItem = document.createElement('div');
-            noteItem.classList.add('note-item');
-            noteItem.innerHTML = `
-                <div>${note.context}</div>
-                <button data-id="${note.noteId}" class="delete-note-button">Delete</button>
-            `;
-            noteListContainer.appendChild(noteItem);
-        });
-
-        // 绑定删除按钮事件
-        document.querySelectorAll('.delete-note-button').forEach(button => {
-            button.addEventListener('click', async () => {
-                const noteId = button.dataset.id;
-                await deleteNote(noteId);
-                renderNotes(); // 删除后重新加载笔记列表
-            });
-        });
-    } catch (error) {
-        console.error(error);
-        alert('Error fetching notes.');
-    }
-}
-
-async function addNote() {
+// 添加笔记功能
+document.getElementById('save-note-button').addEventListener('click', async () => {
     const noteText = document.getElementById('note-text').value.trim();
-    if (!noteText) {
-        alert('Please enter some text for the note.');
-        return;
-    }
+    if (!noteText) return alert('请输入笔记内容！');
     try {
         const response = await fetch('/api/user/notes', {
             method: 'POST',
@@ -100,19 +66,20 @@ async function addNote() {
             },
             body: JSON.stringify({ context: noteText }),
         });
-
-        if (!response.ok) throw new Error('Failed to save note.');
-
-        document.getElementById('note-text').value = ''; // 清空输入框
-        alert('Note added successfully!');
-        renderNotes(); // 重新加载笔记列表
+        if (!response.ok) throw new Error('添加笔记失败！');
+        alert('笔记添加成功！');
+        document.getElementById('note-text').value = '';
+        toggleModal('note-modal', 'add');
     } catch (error) {
+        alert(`错误：${error.message}`);
         console.error(error);
-        alert('Error adding note.');
     }
-}
+});
 
-async function deleteNote(noteId) {
+// 删除笔记功能
+document.getElementById('delete-note-button').addEventListener('click', async () => {
+    const noteId = document.getElementById('delete-note-id').value.trim();
+    if (!noteId) return alert('请输入要删除的笔记ID！');
     try {
         const response = await fetch(`/api/user/notes/${noteId}`, {
             method: 'DELETE',
@@ -120,26 +87,50 @@ async function deleteNote(noteId) {
                 Authorization: `Bearer ${localStorage.getItem('token')}`,
             },
         });
-
-        if (!response.ok) throw new Error('Failed to delete note.');
-
-        alert('Note deleted successfully!');
+        if (!response.ok) throw new Error('删除笔记失败！');
+        alert('笔记删除成功！');
+        document.getElementById('delete-note-id').value = '';
     } catch (error) {
+        alert(`错误：${error.message}`);
         console.error(error);
-        alert('Error deleting note.');
     }
-}
-document.getElementById('save-note-button').addEventListener('click', addNote);
+});
 
-// 图片操作
-document.getElementById('upload-image-button').addEventListener('click', async () => {
-    const fileInput = document.getElementById('image-upload');
-    const formData = new FormData();
-    const file = fileInput.files[0];
-    if (!file) {
-        alert('Please select an image to upload.');
-        return;
+// 图片管理功能
+document.getElementById('open-add-image-modal').addEventListener('click', () => toggleModal('add-image-modal', 'remove'));
+document.getElementById('close-add-image-modal').addEventListener('click', () => toggleModal('add-image-modal', 'add'));
+
+// 拖放上传图片功能
+const dropZone = document.getElementById('image-drop-zone');
+dropZone.addEventListener('dragover', (e) => {
+    e.preventDefault();
+    dropZone.classList.add('dragging');
+});
+dropZone.addEventListener('dragleave', () => dropZone.classList.remove('dragging'));
+dropZone.addEventListener('drop', (e) => {
+    e.preventDefault();
+    dropZone.classList.remove('dragging');
+    const file = e.dataTransfer.files[0];
+    if (file) {
+        uploadImage(file);
     }
+});
+
+// 点击选择文件上传功能
+dropZone.addEventListener('click', () => {
+    const fileInput = document.getElementById('image-upload');
+    fileInput.click();
+    fileInput.addEventListener('change', (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            uploadImage(file);
+        }
+    });
+});
+
+// 上传图片功能
+async function uploadImage(file) {
+    const formData = new FormData();
     formData.append('image', file);
     try {
         const response = await fetch('/api/user/images', {
@@ -149,21 +140,19 @@ document.getElementById('upload-image-button').addEventListener('click', async (
             },
             body: formData,
         });
-        if (!response.ok) throw new Error('Failed to upload image.');
-        alert('Image uploaded successfully!');
-        toggleModal('add-image-modal', 'add'); // 关闭上传弹窗
+        if (!response.ok) throw new Error('图片上传失败！');
+        alert('图片上传成功！');
+        toggleModal('add-image-modal', 'add');
     } catch (error) {
+        alert(`错误：${error.message}`);
         console.error(error);
-        alert('Error uploading image.');
     }
-});
+}
 
+// 删除图片功能
 document.getElementById('delete-image-button').addEventListener('click', async () => {
     const imageId = document.getElementById('image-id-input').value.trim();
-    if (!imageId) {
-        alert('Please enter an image ID.');
-        return;
-    }
+    if (!imageId) return alert('请输入要删除的图片ID！');
     try {
         const response = await fetch(`/api/user/images/${imageId}`, {
             method: 'DELETE',
@@ -171,12 +160,12 @@ document.getElementById('delete-image-button').addEventListener('click', async (
                 Authorization: `Bearer ${localStorage.getItem('token')}`,
             },
         });
-        if (!response.ok) throw new Error('Failed to delete image.');
-        alert('Image deleted successfully!');
-        toggleModal('delete-image-modal', 'add'); // 关闭删除弹窗
+        if (!response.ok) throw new Error('删除图片失败！');
+        alert('图片删除成功！');
+        document.getElementById('image-id-input').value = '';
     } catch (error) {
+        alert(`错误：${error.message}`);
         console.error(error);
-        alert('Error deleting image.');
     }
 });
 
