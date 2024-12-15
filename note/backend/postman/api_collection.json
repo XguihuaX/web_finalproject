@@ -1,0 +1,668 @@
+{
+  "info": {
+    "name": "后端 API 测试",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "1. 认证测试",
+      "item": [
+        {
+          "name": "注册普通用户",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"状态码为 201\", function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "",
+                  "var jsonData = pm.response.json();",
+                  "console.log('注册响应:', jsonData);",
+                  "",
+                  "pm.test(\"响应包含用户ID\", function () {",
+                  "    pm.expect(jsonData.userId).to.exist;",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"username\": \"testuser\",\n    \"password\": \"testpass\",\n    \"status\": \"user\"\n}"
+            },
+            "url": "{{baseUrl}}/api/auth/register"
+          }
+        },
+        {
+          "name": "注册管理员",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"状态码为 201\", function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "",
+                  "var jsonData = pm.response.json();",
+                  "console.log('注册响应:', jsonData);",
+                  "",
+                  "pm.test(\"响应包含用户ID\", function () {",
+                  "    pm.expect(jsonData.userId).to.exist;",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"username\": \"admin\",\n    \"password\": \"adminpass\",\n    \"status\": \"admin\"\n}"
+            },
+            "url": "{{baseUrl}}/api/auth/register"
+          }
+        },
+        {
+          "name": "管理员登录",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"状态码为 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "var jsonData = pm.response.json();",
+                  "console.log('登录响应:', jsonData);",
+                  "",
+                  "pm.test(\"响应包含令牌\", function () {",
+                  "    pm.expect(jsonData.token).to.exist;",
+                  "});",
+                  "",
+                  "pm.test(\"响应包含用户信息\", function () {",
+                  "    pm.expect(jsonData.user).to.exist;",
+                  "    pm.expect(jsonData.user.userId).to.exist;",
+                  "    pm.expect(jsonData.user.status).to.equal('admin');",
+                  "});",
+                  "",
+                  "if (jsonData.token) {",
+                  "    pm.environment.set(\"adminToken\", jsonData.token);",
+                  "}",
+                  "",
+                  "if (jsonData.user && jsonData.user.userId) {",
+                  "    pm.environment.set(\"adminId\", jsonData.user.userId);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"username\": \"admin\",\n    \"password\": \"adminpass\"\n}"
+            },
+            "url": "{{baseUrl}}/api/auth/login"
+          }
+        },
+        {
+          "name": "用户登录",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"状态码为 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "var jsonData = pm.response.json();",
+                  "console.log('登录响应:', jsonData);",
+                  "",
+                  "pm.test(\"响应包含令牌\", function () {",
+                  "    pm.expect(jsonData.token).to.exist;",
+                  "});",
+                  "",
+                  "pm.test(\"响应包含用户信息\", function () {",
+                  "    pm.expect(jsonData.user).to.exist;",
+                  "    pm.expect(jsonData.user.userId).to.exist;",
+                  "});",
+                  "",
+                  "if (jsonData.token) {",
+                  "    pm.environment.set(\"userToken\", jsonData.token);",
+                  "}",
+                  "",
+                  "if (jsonData.user && jsonData.user.userId) {",
+                  "    pm.environment.set(\"userId\", jsonData.user.userId);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"username\": \"testuser\",\n    \"password\": \"testpass\"\n}"
+            },
+            "url": "{{baseUrl}}/api/auth/login"
+          }
+        }
+      ]
+    },
+    {
+      "name": "2. 用户操作",
+      "item": [
+        {
+          "name": "创建笔记",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"状态码为 201\", function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "",
+                  "var jsonData = pm.response.json();",
+                  "console.log('创建笔记响应:', jsonData);",
+                  "",
+                  "pm.test(\"响应包含笔记信息\", function () {",
+                  "    pm.expect(jsonData.noteId).to.exist;",
+                  "    pm.expect(jsonData.userId).to.exist;",
+                  "    pm.expect(jsonData.context).to.exist;",
+                  "});",
+                  "",
+                  "if (jsonData && jsonData.noteId) {",
+                  "    pm.environment.set(\"noteId\", jsonData.noteId);",
+                  "    console.log('设置笔记ID:', jsonData.noteId);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{userToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"context\": \"这是一条测试笔记\"\n}"
+            },
+            "url": "{{baseUrl}}/api/user/notes"
+          }
+        },
+        {
+          "name": "获取用户笔记列表",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"状态码为 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "var jsonData = pm.response.json();",
+                  "console.log('获取笔记响应:', jsonData);",
+                  "",
+                  "pm.test(\"响应是一个数组\", function () {",
+                  "    pm.expect(jsonData).to.be.an('array');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{userToken}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/user/notes"
+          }
+        },
+        {
+          "name": "获取单条笔记",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"状态码为 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "var jsonData = pm.response.json();",
+                  "console.log('获取单条笔记响应:', jsonData);",
+                  "",
+                  "pm.test(\"响应包含笔记信息\", function () {",
+                  "    pm.expect(jsonData.noteId).to.exist;",
+                  "    pm.expect(jsonData.userId).to.exist;",
+                  "    pm.expect(jsonData.context).to.exist;",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{userToken}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/user/notes/{{noteId}}"
+          }
+        },
+        {
+          "name": "删除笔记",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"状态码为 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "var jsonData = pm.response.json();",
+                  "console.log('删除笔记响应:', jsonData);",
+                  "",
+                  "pm.test(\"响应包含成功消息\", function () {",
+                  "    pm.expect(jsonData.message).to.exist;",
+                  "    pm.expect(jsonData.message).to.equal('笔记删除成功');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{userToken}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/user/notes/{{noteId}}"
+          }
+        },
+        {
+          "name": "上传图片",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"状态码为 201\", function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "",
+                  "var jsonData = pm.response.json();",
+                  "console.log('上传图片响应:', jsonData);",
+                  "",
+                  "pm.test(\"响应包含图片信息\", function () {",
+                  "    pm.expect(jsonData.imageId).to.exist;",
+                  "    pm.expect(jsonData.imageUrl).to.exist;",
+                  "});",
+                  "",
+                  "if (jsonData.imageId) {",
+                  "    pm.environment.set(\"imageId\", jsonData.imageId);",
+                  "    console.log('设置图片ID:', jsonData.imageId);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{userToken}}"
+              }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "image",
+                  "type": "file",
+                  "src": "./test-image.jpg",
+                  "description": "请选择要上传的图片文件"
+                }
+              ]
+            },
+            "url": "{{baseUrl}}/api/user/images"
+          }
+        },
+        {
+          "name": "获取用户图片列表",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"状态码为 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "var jsonData = pm.response.json();",
+                  "console.log('获取图片列表响应:', jsonData);",
+                  "",
+                  "pm.test(\"响应是一个数组\", function () {",
+                  "    pm.expect(jsonData).to.be.an('array');",
+                  "});",
+                  "",
+                  "if (jsonData.length > 0) {",
+                  "    pm.test(\"图片项包含必需字段\", function () {",
+                  "        const firstImage = jsonData[0];",
+                  "        pm.expect(firstImage.imageId).to.exist;",
+                  "        pm.expect(firstImage.imageUrl).to.exist;",
+                  "        pm.expect(firstImage.userId).to.exist;",
+                  "    });",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{userToken}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/user/images"
+          }
+        },
+        {
+          "name": "获取单张图片",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"状态码为 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "var jsonData = pm.response.json();",
+                  "console.log('获取单张图片响应:', jsonData);",
+                  "",
+                  "pm.test(\"响应包含图片信息\", function () {",
+                  "    pm.expect(jsonData.imageId).to.exist;",
+                  "    pm.expect(jsonData.imageUrl).to.exist;",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{userToken}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/user/images/{{imageId}}"
+          }
+        },
+        {
+          "name": "删除图片",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"状态码为 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "var jsonData = pm.response.json();",
+                  "console.log('删除图片响应:', jsonData);",
+                  "",
+                  "pm.test(\"响应包含成功消息\", function () {",
+                  "    pm.expect(jsonData.message).to.exist;",
+                  "    pm.expect(jsonData.message).to.equal('图片删除成功');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{userToken}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/user/images/{{imageId}}"
+          }
+        }
+      ]
+    },
+    {
+      "name": "3. 管理员操作",
+      "item": [
+        {
+          "name": "获取所有用户列表",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"状态码为 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "var jsonData = pm.response.json();",
+                  "console.log('获取用户列表响应:', jsonData);",
+                  "",
+                  "pm.test(\"响应包含data数组\", function () {",
+                  "    pm.expect(jsonData.data).to.be.an('array');",
+                  "});",
+                  "",
+                  "if (jsonData.data && jsonData.data.length > 0) {",
+                  "    pm.test(\"用户项包含必需字段\", function () {",
+                  "        const firstUser = jsonData.data[0];",
+                  "        pm.expect(firstUser.userId).to.exist;",
+                  "        pm.expect(firstUser.username).to.exist;",
+                  "        pm.expect(firstUser.status).to.exist;",
+                  "    });",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/admin/users"
+          }
+        },
+        {
+          "name": "获取所有笔记",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"状态码为 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "var jsonData = pm.response.json();",
+                  "console.log('获取所有笔记响应:', jsonData);",
+                  "",
+                  "pm.test(\"响应包含data数组\", function () {",
+                  "    pm.expect(jsonData.data).to.be.an('array');",
+                  "});",
+                  "",
+                  "if (jsonData.data && jsonData.data.length > 0) {",
+                  "    pm.test(\"笔记项包含必需字段\", function () {",
+                  "        const firstNote = jsonData.data[0];",
+                  "        pm.expect(firstNote.noteId).to.exist;",
+                  "        pm.expect(firstNote.userId).to.exist;",
+                  "        pm.expect(firstNote.context).to.exist;",
+                  "    });",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/admin/notes"
+          }
+        },
+        {
+          "name": "获取所有图片",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"状态码为 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "var jsonData = pm.response.json();",
+                  "console.log('获取所有图片响应:', jsonData);",
+                  "",
+                  "pm.test(\"响应包含data数组\", function () {",
+                  "    pm.expect(jsonData.data).to.be.an('array');",
+                  "});",
+                  "",
+                  "if (jsonData.data && jsonData.data.length > 0) {",
+                  "    pm.test(\"图片项包含必需字段\", function () {",
+                  "        const firstImage = jsonData.data[0];",
+                  "        pm.expect(firstImage.imageId).to.exist;",
+                  "        pm.expect(firstImage.imageUrl).to.exist;",
+                  "        pm.expect(firstImage.userId).to.exist;",
+                  "    });",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/admin/images"
+          }
+        },
+        {
+          "name": "删除用户",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"状态码为 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "var jsonData = pm.response.json();",
+                  "console.log('删除用户响应:', jsonData);",
+                  "",
+                  "pm.test(\"响应包含成功消息\", function () {",
+                  "    pm.expect(jsonData.message).to.exist;",
+                  "    pm.expect(jsonData.message).to.equal('用户删除成功');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/admin/users/{{userId}}"
+          }
+        }
+      ]
+    }
+  ]
+}

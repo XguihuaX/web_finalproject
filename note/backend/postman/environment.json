@@ -1,0 +1,35 @@
+{
+  "name": "Web Final Project Environment",
+  "values": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:3000",
+      "enabled": true
+    },
+    {
+      "key": "userToken",
+      "value": "",
+      "enabled": true
+    },
+    {
+      "key": "adminToken",
+      "value": "",
+      "enabled": true
+    },
+    {
+      "key": "userId",
+      "value": "",
+      "enabled": true
+    },
+    {
+      "key": "noteId",
+      "value": "",
+      "enabled": true
+    },
+    {
+      "key": "imageId",
+      "value": "",
+      "enabled": true
+    }
+  ]
+}

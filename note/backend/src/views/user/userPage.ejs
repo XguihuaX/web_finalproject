@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Dashboard</title>
+    <link rel="stylesheet" href="/public/css/userPage.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <!-- 侧边栏切换按钮 -->
+    <button id="sidebar-toggle">
+        <span class="arrow">❯</span>
+    </button>
+
+    <!-- 侧边栏 -->
+    <div class="sidebar">
+        <!-- 天气查询部分 -->
+        <div class="sidebar-section">
+            <h3>Weather</h3>
+            <div class="sidebar-weather">
+                <input type="text" id="city-input" placeholder="Enter city name..." />
+                <button id="city-button">Search</button>
+            </div>
+        </div>
+        <div class="sidebar-section">
+            <h3>Note</h3>
+            <button id="open-note-modal">Open Notes</button>
+        </div>
+        <!-- 背景选择部分 -->
+        <div class="sidebar-section">
+            <h3>Background</h3>
+            <select id="background-select">
+                <option value="paper">Paper</option>
+                <option value="custom1">Custom 1</option>
+                <option value="custom2">Custom 2</option>
+            </select>
+        </div>
+        
+    </div>
+    
+    <!-- 主要内容区域 -->
+    <div class="main-content">
+        <div id="time">Loading time...</div>
+        <div id="weather">Loading weather...</div>
+        <div id="llm-section">
+            <input type="text" id="llm-input" placeholder="Ask me something..." />
+            <button id="llm-button">Send</button>
+            <div id="llm-response">Your response will appear here...</div>
+        </div>
+    </div>
+    <div id="note-modal" class="modal hidden">
+    <div class="modal-content">
+        <span id="close-note-modal" class="close-button">×</span>
+        <h3>Add Note</h3>
+        <input type="date" id="note-date" />
+        <textarea id="note-text" placeholder="Write your note here..."></textarea>
+        <button id="save-note-button">Save Note</button>
+        <div id="note-list">
+            <!-- 笔记列表 -->
+        </div>
+    </div>
+</div>
+    <script src="/public/js/userPage.js"></script>
+</body>
+</html>
