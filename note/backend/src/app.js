@@ -4,8 +4,6 @@ const path = require("path");
 const cors = require("cors");
 
 // 引入路由
-const authRoutes = require("./routes/authRoutes.js"); // 认证相关API
-const userRoutes = require("./routes/userRoutes.js"); // 用户相关API
 const adminRoutes = require("./routes/adminRoute.js"); // 管理员相关API
 const indexRoutes = require("./routes/indexRoutes.js"); // 前端页面的路由
 const authPageRoutes = require("./routes/authPage.js"); // 前端认证页面路由
@@ -42,15 +40,15 @@ app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "views"));
 
 // 路由配置（API）
-app.use("/api/auth", authRoutes);
-app.use("/api/user", userRoutes);
+app.use("/api/auth", authPageRoutes);
+app.use("/api/user", userPageRoutes);
 app.use("/api/admin", adminRoutes);
 
 // 路由配置（前端页面）
 app.use("/", indexRoutes); // 首页
-app.use("/auth", authPage); // 登录/注册页面
-app.use("/user", userPage); // 用户页面
-app.use("/admin", adminPage); // 管理员页面
+app.use("/auth", authPageRoutes); // 登录/注册页面
+app.use("/user", userPageRoutes); // 用户页面
+app.use("/admin", adminPageRoutes); // 管理员页面
 
 // 错误处理中间件
 app.use((err, _req, res, _next) => {
