@@ -94,14 +94,14 @@ async function callLLMAPI(query) {
     }
 }
 
-document.getElementById('llm-button').addEventListener('click', async () => {
-    const query = document.getElementById('llm-input').value;
-    const responseElement = document.getElementById('llm-response');
-    if (!query.trim()) return alert('Please enter a query.');
-    responseElement.textContent = 'Processing...';
-    const response = await callLLMAPI(query);
-    responseElement.textContent = response;
-});
+// document.getElementById('llm-button').addEventListener('click', async () => {
+//     const query = document.getElementById('llm-input').value;
+//     const responseElement = document.getElementById('llm-response');
+//     if (!query.trim()) return alert('Please enter a query.');
+//     responseElement.textContent = 'Processing...';
+//     const response = await callLLMAPI(query);
+//     responseElement.textContent = response;
+// });
 
 /** ==============================
  *  6. 用户、笔记、图片管理 API 调用
@@ -110,54 +110,91 @@ const adminOutput = document.getElementById('admin-output');
 
 async function sendAdminRequest(url, method = 'GET', body = null) {
     try {
-        const options = { method, headers: { 'Content-Type': 'application/json' } };
-        if (body) options.body = JSON.stringify(body);
+        console.log("Requesting:", url);
+
+        // Retrieve the token from localStorage
+        const token = localStorage.getItem('token');
+        if (!token) {
+            throw new Error("Authentication token not found. Please log in.");
+        }
+
+        // Prepare request options with authentication
+        const options = { 
+            method, 
+            headers: { 
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}` // Add token for authentication
+            } 
+        };
+
+        // Make the request
         const response = await fetch(url, options);
-        const data = await response.json();
-        if (!response.ok) throw new Error(data.message || 'Request failed');
+        let data;
+
+        // Attempt to parse JSON
+        try {
+            data = await response.json();
+        } catch (jsonError) {
+            throw new Error("Invalid JSON response from server"+jsonError);
+        }
+
+        // Check if the response is successful
+        if (!response.ok) {
+            throw new Error(data.message || `Request failed with status ${response.status}`);
+        }
+
+        // Handle successful response
+        console.log("API Response:", data);
         adminOutput.textContent = JSON.stringify(data, null, 2);
     } catch (error) {
-        adminOutput.textContent = `Error: ${error.message}`;
+        // Handle network errors or other issues
+        if (error.name === "TypeError" && error.message === "Failed to fetch") {
+            adminOutput.textContent = "Network error: Unable to connect to the server.";
+        } else {
+            adminOutput.textContent = `Error: ${error.message}`;
+        }
+        console.error("Request Error:", error.message);
     }
 }
 
+
 // 用户管理
-document.getElementById('view-users').addEventListener('click', () => sendAdminRequest('/admin/users'));
+document.getElementById('view-users').addEventListener('click', () => sendAdminRequest('/api/admin/users'));
 document.getElementById('view-user').addEventListener('click', () => {
     const userId = document.getElementById('user-id-input').value.trim();
     if (!userId) return alert('Please enter a User ID');
-    sendAdminRequest(`/admin/users/${userId}`);
+    sendAdminRequest(`/api/admin/users/${userId}`);
 });
 document.getElementById('delete-user').addEventListener('click', () => {
     const userId = document.getElementById('user-id-input').value.trim();
     if (!userId) return alert('Please enter a User ID');
-    sendAdminRequest(`/admin/users/${userId}`, 'DELETE');
+    sendAdminRequest(`/api/admin/users/${userId}`, 'DELETE');
 });
 
 // 笔记管理
-document.getElementById('view-notes').addEventListener('click', () => sendAdminRequest('/admin/notes'));
+document.getElementById('view-notes').addEventListener('click', () => sendAdminRequest('/api/admin/notes'));
 document.getElementById('view-note').addEventListener('click', () => {
     const noteId = document.getElementById('note-id-input').value.trim();
     if (!noteId) return alert('Please enter a Note ID');
-    sendAdminRequest(`/admin/notes/${noteId}`);
+    sendAdminRequest(`/api/admin/notes/${noteId}`);
 });
 document.getElementById('delete-note').addEventListener('click', () => {
     const noteId = document.getElementById('note-id-input').value.trim();
     if (!noteId) return alert('Please enter a Note ID');
-    sendAdminRequest(`/admin/notes/${noteId}`, 'DELETE');
+    sendAdminRequest(`/api/admin/notes/${noteId}`, 'DELETE');
 });
 
 // 图片管理
-document.getElementById('view-images').addEventListener('click', () => sendAdminRequest('/admin/images'));
+document.getElementById('view-images').addEventListener('click', () => sendAdminRequest('/api/admin/images'));
 document.getElementById('view-image').addEventListener('click', () => {
     const imageId = document.getElementById('image-id-input').value.trim();
     if (!imageId) return alert('Please enter an Image ID');
-    sendAdminRequest(`/admin/images/${imageId}`);
+    sendAdminRequest(`/api/admin/images/${imageId}`);
 });
 document.getElementById('delete-image').addEventListener('click', () => {
     const imageId = document.getElementById('image-id-input').value.trim();
     if (!imageId) return alert('Please enter an Image ID');
-    sendAdminRequest(`/admin/images/${imageId}`, 'DELETE');
+    sendAdminRequest(`/api/admin/images/${imageId}`, 'DELETE');
 });
 
 /** ==============================
