@@ -24,6 +24,14 @@ document.getElementById('background-select').addEventListener('change', function
     }
 });
 
+document.getElementById('logout-button').addEventListener('click', () => {
+    // 执行登出逻辑（例如清除本地存储中的 token）
+    localStorage.removeItem('token');
+
+    // 跳转到 index.ejs（或指定路径的页面）
+    window.location.href = '/index';
+});
+
 // 侧边栏切换功能
 document.getElementById('sidebar-toggle').addEventListener('click', () => {
     document.body.classList.toggle('sidebar-closed');
