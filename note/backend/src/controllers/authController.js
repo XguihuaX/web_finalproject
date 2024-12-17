@@ -88,7 +88,7 @@ exports.login = async (req, res) => {
     if( user.status === "user")
       res.redirect("/user/userpage");
     else if (user.status === "admin")
-      res.redirect("/user/adminpage");
+      res.redirect("/admin/adminpage");
     else
       res.status(400).json({ message: "无效的用户状态" });
 
