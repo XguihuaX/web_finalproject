@@ -32,14 +32,14 @@ document.getElementById('sidebar-toggle').addEventListener('click', () => {
 // 天气查询功能
 document.getElementById('city-button').addEventListener('click', async () => {
     const city = document.getElementById('city-input').value.trim();
-    if (!city) return alert('请输入城市名称！');
+    if (!city) return alert('please input the cityname！');
     try {
         const response = await fetch(`https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=YOUR_API_KEY&units=metric`);
-        if (!response.ok) throw new Error('天气查询失败！');
+        if (!response.ok) throw new Error('weather search failed！');
         const data = await response.json();
         document.getElementById('weather').textContent = `${data.name}: ${data.weather[0].description}, ${data.main.temp}°C`;
     } catch (error) {
-        document.getElementById('weather').textContent = '无法获取天气。';
+        document.getElementById('weather').textContent = 'cannot get weather。';
         console.error(error);
     }
 });
@@ -79,7 +79,7 @@ document.getElementById('close-note-modal').addEventListener('click', () => togg
 // 添加笔记功能
 document.getElementById('save-note-button').addEventListener('click', async () => {
     const noteText = document.getElementById('note-text').value.trim();
-    if (!noteText) return alert('请输入笔记内容！');
+    if (!noteText) return alert('please input text！');
     try {
         const response = await fetch('/api/user/notes', {
             method: 'POST',
@@ -89,8 +89,8 @@ document.getElementById('save-note-button').addEventListener('click', async () =
             },
             body: JSON.stringify({ context: noteText }),
         });
-        if (!response.ok) throw new Error('添加笔记失败！');
-        alert('笔记添加成功！');
+        if (!response.ok) throw new Error('add note failed！');
+        alert('add note succuessed！');
         document.getElementById('note-text').value = '';
         toggleModal('note-modal', 'add');
     } catch (error) {
@@ -102,7 +102,7 @@ document.getElementById('save-note-button').addEventListener('click', async () =
 // 删除笔记功能
 document.getElementById('delete-note-button').addEventListener('click', async () => {
     const noteId = document.getElementById('delete-note-id').value.trim();
-    if (!noteId) return alert('请输入要删除的笔记ID！');
+    if (!noteId) return alert('please input image ID you want to delete！');
     try {
         const response = await fetch(`/api/user/notes/${noteId}`, {
             method: 'DELETE',
@@ -110,11 +110,11 @@ document.getElementById('delete-note-button').addEventListener('click', async ()
                 Authorization: `Bearer ${localStorage.getItem('token')}`,
             },
         });
-        if (!response.ok) throw new Error('删除笔记失败！');
-        alert('笔记删除成功！');
+        if (!response.ok) throw new Error('delete failed！');
+        alert('delete success！');
         document.getElementById('delete-note-id').value = '';
     } catch (error) {
-        alert(`错误：${error.message}`);
+        alert(`error：${error.message}`);
         console.error(error);
     }
 });
@@ -164,10 +164,10 @@ async function uploadImage(file) {
             body: formData,
         });
         if (!response.ok) throw new Error('图片上传失败！');
-        alert('图片上传成功！');
+        alert('iamge upload success！');
         toggleModal('add-image-modal', 'add');
     } catch (error) {
-        alert(`错误：${error.message}`);
+        alert(`error：${error.message}`);
         console.error(error);
     }
 }
@@ -175,7 +175,7 @@ async function uploadImage(file) {
 // 删除图片功能
 document.getElementById('delete-image-button').addEventListener('click', async () => {
     const imageId = document.getElementById('image-id-input').value.trim();
-    if (!imageId) return alert('请输入要删除的图片ID！');
+    if (!imageId) return alert('input the image ID you want to delete！');
     try {
         const response = await fetch(`/api/user/images/${imageId}`, {
             method: 'DELETE',
@@ -183,11 +183,11 @@ document.getElementById('delete-image-button').addEventListener('click', async (
                 Authorization: `Bearer ${localStorage.getItem('token')}`,
             },
         });
-        if (!response.ok) throw new Error('删除图片失败！');
-        alert('图片删除成功！');
+        if (!response.ok) throw new Error('failed！');
+        alert('successed！');
         document.getElementById('image-id-input').value = '';
     } catch (error) {
-        alert(`错误：${error.message}`);
+        alert(`error：${error.message}`);
         console.error(error);
     }
 });
