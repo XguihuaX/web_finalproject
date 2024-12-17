@@ -52,7 +52,13 @@ async function getWeatherByLocation(latitude, longitude) {
         console.error('Weather query error:', error);
     }
 }
+document.getElementById('logout-button').addEventListener('click', () => {
+    // 执行登出逻辑（例如清除本地存储中的 token）
+    localStorage.removeItem('token');
 
+    // 跳转到 index.ejs（或指定路径的页面）
+    window.location.href = '/index';
+});
 // Get weather information by city name
 async function getWeatherByCity(cityName) {
     const apiKey = 'f8f0f918c0c7695dbae5f4c687a1de14';
