@@ -98,14 +98,6 @@ async function callLLMAPI(query) {
     }
 }
 
-// document.getElementById('llm-button').addEventListener('click', async () => {
-//     const query = document.getElementById('llm-input').value;
-//     const responseElement = document.getElementById('llm-response');
-//     if (!query.trim()) return alert('Please enter a query.');
-//     responseElement.textContent = 'Processing...';
-//     const response = await callLLMAPI(query);
-//     responseElement.textContent = response;
-// });
 
 /** ==============================
  *  6. 用户、笔记、图片管理 API 调用

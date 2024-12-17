@@ -90,27 +90,31 @@ function fetchWeatherUsingCurrentLocation() {
 fetchWeatherUsingCurrentLocation();
 
 async function callLLMAPI(query) {
-    const OPENAI_API_KEY = 'openai_Key';
     try {
-        const response = await fetch('https://api.openai.com/v1/chat/completions', {
+        const response = await fetch('/api/llm', {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                Authorization: `Bearer ${OPENAI_API_KEY}`,
-            },
-            body: JSON.stringify({
-                model: 'gpt-4o-mini',
-                messages: [{ role: 'user', content: query }],
-            }),
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ query }),
         });
-        if (!response.ok) throw new Error('LLM API call failed');
+
+        if (!response.ok) throw new Error('Backend API call failed');
+
         const data = await response.json();
-        return data.choices[0].message.content;
+        return data.content; // Return the content from the backend
     } catch (error) {
-        console.error(error);
+        console.error('Error:', error.message);
         return 'Sorry, API request failed. Please try again later.';
     }
 }
+
+document.getElementById('llm-button').addEventListener('click', async () => {
+    const query = document.getElementById('llm-input').value;
+    const responseElement = document.getElementById('llm-response');
+    if (!query.trim()) return alert('Please enter a query.');
+    responseElement.textContent = 'Processing...';
+    const response = await callLLMAPI(query);
+    responseElement.textContent = response;
+});
 
 // 模态框显示/隐藏功能
 function toggleModal(modalId, action) {

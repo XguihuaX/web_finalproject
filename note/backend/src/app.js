@@ -54,6 +54,50 @@ app.use("/admin", adminPageRoutes); // 管理员页面
 // Load API key from .env file
 const WEATHER_API_KEY = process.env.WEATHER_API_KEY;
 
+// Load the OpenAI API Key from environment variables
+const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
+
+// Route to call OpenAI API securely
+app.post('/api/llm', async (req, res) => {
+    const { query } = req.body; // Extract user query from the request body
+
+    if (!query) {
+        return res.status(400).json({ message: 'Query is required' });
+    }
+
+    try {
+        // Make a request to OpenAI's API
+        const response = await fetch('https://api.openai.com/v1/chat/completions', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${OPENAI_API_KEY}`,
+            },
+            body: JSON.stringify({
+                model: 'gpt-4o-mini',
+                messages: [{ role: 'user', content: query }],
+            }),
+        });
+
+        // Check if OpenAI's API request was successful
+        if (!response.ok) {
+            const errorText = await response.text();
+            console.error('OpenAI API Error:', errorText);
+            return res.status(500).json({ message: 'Failed to fetch response from LLM' });
+        }
+
+        const data = await response.json();
+        const messageContent = data.choices[0]?.message?.content || 'No response';
+
+        // Send the OpenAI response to the client
+        res.json({ content: messageContent });
+    } catch (error) {
+        console.error('Error calling OpenAI API:', error.message);
+        res.status(500).json({ message: 'Internal server error' });
+    }
+});
+
+
 // Route to fetch weather data by coordinates
 app.get('/api/weather', async (req, res) => {
   const { latitude, longitude } = req.query;
