@@ -47,8 +47,7 @@ exports.register = async (req, res) => {
     };
     console.log("register user:", userResponse);
 
-    // res.status(201).json(userResponse);
-    res.redirect("/auth/login");
+    res.status(201).json(userResponse);
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
@@ -76,21 +75,14 @@ exports.login = async (req, res) => {
     const token = jwtUtils.generateToken(user);
     console.log(user);
     // 返回用户信息和token
-    // res.json({
-    //   token,
-    //   user: {
-    //     userId: user.userId,
-    //     username: user.username,
-    //     status: user.status,
-    //   },
-    // });
-
-    if( user.status === "user")
-      res.redirect("/user/userpage");
-    else if (user.status === "admin")
-      res.redirect("/admin/adminpage");
-    else
-      res.status(400).json({ message: "无效的用户状态" });
+    res.json({
+      token,
+      user: {
+        userId: user.userId,
+        username: user.username,
+        status: user.status,
+      },
+    });
 
   } catch (err) {
     res.status(500).json({ message: err.message });

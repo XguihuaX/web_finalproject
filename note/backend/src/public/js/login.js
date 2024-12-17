@@ -11,31 +11,37 @@ document.getElementById('login-form').addEventListener('submit', async (event) =
     }
 
     try {
-        // 使用 Fetch API 向后端发送登录请求
+        // Send login request to the backend
         const response = await fetch('/auth/login', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                username,
-                password,
-            }),
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ username, password }),
         });
-
+    
         const result = await response.json();
-
+    
         if (response.ok) {
-            // 登录成功，跳转到用户主页或仪表盘
-            alert('Login successful!');
-            window.location.href = '/user/dashboard';
+          // Store token in localStorage
+          localStorage.setItem("token", result.token);
+          alert('Login successful!');
+    
+          // Redirect user based on their status
+          if (result.user.status === "admin") {
+            window.location.href = "/admin/adminpage";
+          } else if (result.user.status === "user") {
+            window.location.href = "/user/userpage";
+          } else {
+            alert("Unknown user status. Please contact support.");
+          }
         } else {
-            // 显示后端返回的错误信息
-            alert(`Login failed: ${result.message}`);
+          // Handle login failure
+          alert(`Login failed: ${result.message}`);
         }
-    } catch (error) {
+      } catch (error) {
         console.error('Error during login:', error);
         alert('An error occurred. Please try again.');
-    }
+      }
 });
 

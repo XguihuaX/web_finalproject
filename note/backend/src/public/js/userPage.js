@@ -52,6 +52,47 @@ document.getElementById('city-button').addEventListener('click', async () => {
     }
 });
 
+const llmButton = document.getElementById('llm-button');
+
+llmButton.addEventListener('click', async () => {
+    const query = document.getElementById('llm-input').value;
+    const responseElement = document.getElementById('llm-response');
+    
+    try {
+        // Input Validation
+        if (!query.trim()) {
+            responseElement.textContent = 'Please enter a valid query.';
+            return;
+        }
+
+        responseElement.textContent = 'Processing...';
+
+        // API Call
+        const response = await callLLMAPI(query);
+
+        // Handle API response
+        if (!response) {
+            throw new Error('Empty response from the server.');
+        }
+
+        responseElement.textContent = response;
+
+        // Text-to-speech function
+        try {
+            speakText(response);
+        } catch (speechError) {
+            console.error('Text-to-speech failed:', speechError.message);
+            responseElement.textContent += '\n(Note: Unable to process text-to-speech.)';
+        }
+
+    } catch (error) {
+        // General Error Handling
+        console.error('Error occurred:', error.message);
+        responseElement.textContent = `An error occurred: ${error.message}. Please try again later.`;
+    }
+});
+
+
 async function callLLMAPI(query) {
     const OPENAI_API_KEY = 'openai_Key';
     try {

@@ -15,12 +15,12 @@
 
         <div class="form-container">
             <h2>Register</h2> 
-            <form action="/auth/register" method="POST">
+            <form id="register-form">
                 <input type="text" id="username" name="username" placeholder="Enter your username" required>
                 <input type="password" id="password" name="password" placeholder="Enter your password" required>
                 <select id="status" name="status" required>
                     <option value="user" selected>User</option>
-                    <option value="admin" selected>Administrator</option>
+                    <option value="admin">Administrator</option>
                 </select>
                 <button type="submit" class="btn">Register</button>
             </form>
@@ -31,6 +31,6 @@
             <i class="fas fa-volume-up"></i>
         </button>
     </div>
-    <script src="/public/js/index.js"></script>
+    <script src="/public/js/register.js"></script>
 </body>
 </html>
