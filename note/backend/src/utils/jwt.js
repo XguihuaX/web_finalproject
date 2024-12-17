@@ -1,59 +1,82 @@
 const jwt = require("jsonwebtoken");
-const secretKey = "12345678"; // 请使用更安全的密钥
+const moment = require("moment-timezone");
 
-// 生成JWT
+const secretKey = "12345678"; // Secret key for signing JWTs
+
+// Generate JWT
 exports.generateToken = (user) => {
-  return jwt.sign({ userId: user.userId, status: user.status }, secretKey, {
-    expiresIn: "24h",
-  });
+  try {
+    const token = jwt.sign(
+      { userId: user.userId, status: user.status },
+      secretKey,
+      { expiresIn: "720h" } // 720 hours expiration directly
+    );
+    console.log("Generated Token:", token);
+    return token;
+  } catch (err) {
+    console.error("Error generating token:", err);
+    throw new Error("Token generation failed");
+  }
 };
 
-// 验证JWT
+// Verify JWT
 exports.verifyToken = (token) => {
   try {
-    return jwt.verify(token, secretKey);
-  } catch (_err) {
+    const decoded = jwt.verify(token, secretKey);
+    console.log("Verified Token:", decoded);
+    return decoded;
+  } catch (err) {
+    console.error("Error verifying token:", err.message);
     throw new Error("Token验证失败");
   }
 };
 
-// 普通token验证中间件
+// Middleware for verifying user tokens
 exports.verifyUserToken = (req, res, next) => {
   try {
-    
-    const token = req.headers.authorization?.split(" ")[1];
-    console.log("Authorization header:", req.headers.authorization);
-    console.log("Token:", token);
+    console.log("Authorization Header:", req.headers.authorization);
+
+    const token = req.headers.authorization?.split(" ")[1]; // Extract token
+    console.log("Extracted Token:", token);
+
     if (!token) {
       return res.status(401).json({ message: "未提供token" });
     }
 
-    const decoded = jwt.verify(token, secretKey);
-    console.log("Decoded token:", decoded); // Log decoded token
-    req.user = decoded;
+    const decoded = jwt.verify(token, secretKey); // Verify token
+    console.log("Decoded Token:", decoded);
+
+    req.user = decoded; // Attach decoded data to request
     next();
-  } catch (_err) {
-    console.log("Error verifying token:", _err);
+  } catch (err) {
+    console.error("Error verifying token:", err);
     return res.status(401).json({ message: "无效的token" });
   }
 };
 
-// 管理员token验证
+// Middleware for verifying admin tokens
 exports.verifyAdminToken = (req, res, next) => {
   try {
-    const token = req.headers.authorization?.split(" ")[1];
+    console.log("Authorization Header:", req.headers.authorization);
+
+    const token = req.headers.authorization?.split(" ")[1]; // Extract token
+    console.log("Extracted Token:", token);
+
     if (!token) {
       return res.status(401).json({ message: "未提供token" });
     }
 
-    const decoded = jwt.verify(token, secretKey);
+    const decoded = jwt.verify(token, secretKey); // Verify token
+    console.log("Decoded Token:", decoded);
+
     if (decoded.status !== "admin") {
       return res.status(403).json({ message: "需要管理员权限" });
     }
 
-    req.user = decoded;
+    req.user = decoded; // Attach decoded data to request
     next();
-  } catch (_err) {
+  } catch (err) {
+    console.error("Error verifying admin token:", err);
     return res.status(401).json({ message: "无效的token" });
   }
 };
