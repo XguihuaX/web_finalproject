@@ -4,7 +4,7 @@ function updateTime() {
     const now = new Date();
     const hours = now.getHours().toString().padStart(2, '0');
     const minutes = now.getMinutes().toString().padStart(2, '0');
-    const month = now.toLocaleString('zh-CN', { month: 'long' });
+    const month = now.toLocaleString('zh-US', { month: 'long' });
     const day = now.getDate();
     timeElement.textContent = `${hours}:${minutes} - ${month} ${day}`;
 }
@@ -51,47 +51,6 @@ document.getElementById('city-button').addEventListener('click', async () => {
         console.error(error);
     }
 });
-
-const llmButton = document.getElementById('llm-button');
-
-llmButton.addEventListener('click', async () => {
-    const query = document.getElementById('llm-input').value;
-    const responseElement = document.getElementById('llm-response');
-    
-    try {
-        // Input Validation
-        if (!query.trim()) {
-            responseElement.textContent = 'Please enter a valid query.';
-            return;
-        }
-
-        responseElement.textContent = 'Processing...';
-
-        // API Call
-        const response = await callLLMAPI(query);
-
-        // Handle API response
-        if (!response) {
-            throw new Error('Empty response from the server.');
-        }
-
-        responseElement.textContent = response;
-
-        // Text-to-speech function
-        try {
-            speakText(response);
-        } catch (speechError) {
-            console.error('Text-to-speech failed:', speechError.message);
-            responseElement.textContent += '\n(Note: Unable to process text-to-speech.)';
-        }
-
-    } catch (error) {
-        // General Error Handling
-        console.error('Error occurred:', error.message);
-        responseElement.textContent = `An error occurred: ${error.message}. Please try again later.`;
-    }
-});
-
 
 async function callLLMAPI(query) {
     const OPENAI_API_KEY = 'openai_Key';
@@ -143,7 +102,7 @@ document.getElementById('save-note-button').addEventListener('click', async () =
         document.getElementById('note-text').value = '';
         toggleModal('note-modal', 'add');
     } catch (error) {
-        alert(`错误：${error.message}`);
+        alert(`error：${error.message}`);
         console.error(error);
     }
 });
@@ -212,7 +171,7 @@ async function uploadImage(file) {
             },
             body: formData,
         });
-        if (!response.ok) throw new Error('图片上传失败！');
+        if (!response.ok) throw new Error('image upload failed！');
         alert('iamge upload success！');
         toggleModal('add-image-modal', 'add');
     } catch (error) {
