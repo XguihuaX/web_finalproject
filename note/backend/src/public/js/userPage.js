@@ -15,8 +15,7 @@ updateTime();
 document.getElementById('background-select').addEventListener('change', function (e) {
     const backgrounds = {
         'paper': '/public/images/basic_background.jpg',
-        'custom1': '/public/images/custom_background_1.jpg',
-        'custom2': '/public/images/custom_background_2.jpg'
+        'custom1': '/public/images/default.png',
     };
     const selectedBackground = backgrounds[e.target.value];
     if (selectedBackground) {

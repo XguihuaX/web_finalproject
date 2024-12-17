@@ -18,9 +18,8 @@ updateTime();
  ============================== */
 document.getElementById('background-select').addEventListener('change', function (e) {
     const backgrounds = {
-        'paper': 'https://cdn.glitch.global/9f5eb1bc-8b6e-4076-9967-025ad2d899b9/paper.jpg?v=1733172469163',
-        'custom1': 'YOUR_CUSTOM_BACKGROUND_1_URL',
-        'custom2': 'YOUR_CUSTOM_BACKGROUND_2_URL'
+        'paper': '/public/images/basic_background.jpg',
+        'custom1': '/public/images/default.png',
     };
     const selectedBackground = backgrounds[e.target.value];
     if (selectedBackground) {
