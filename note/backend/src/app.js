@@ -54,32 +54,52 @@ app.use("/admin", adminPageRoutes); // 管理员页面
 // Load API key from .env file
 const WEATHER_API_KEY = process.env.WEATHER_API_KEY;
 
-// Backend route to fetch weather data securely
+// Route to fetch weather data by coordinates
 app.get('/api/weather', async (req, res) => {
   const { latitude, longitude } = req.query;
 
-  // Validate query parameters
   if (!latitude || !longitude) {
       return res.status(400).json({ message: 'Latitude and longitude are required' });
   }
 
   try {
-      // Call OpenWeatherMap API securely
       const weatherResponse = await fetch(
           `https://api.openweathermap.org/data/2.5/weather?lat=${latitude}&lon=${longitude}&appid=${WEATHER_API_KEY}&units=metric&lang=en`
       );
 
-      if (!weatherResponse.ok) {
-          throw new Error('Weather API request failed');
-      }
+      if (!weatherResponse.ok) throw new Error('Weather API request failed');
 
       const data = await weatherResponse.json();
-      res.json(data); // Send the weather data to the client
+      res.json(data);
   } catch (error) {
       console.error('Error fetching weather:', error.message);
       res.status(500).json({ message: 'Unable to fetch weather information' });
   }
 });
+
+// **New Route: Fetch weather data by city name**
+app.get('/api/weather/city', async (req, res) => {
+  const { city } = req.query;
+
+  if (!city) {
+      return res.status(400).json({ message: 'City name is required' });
+  }
+
+  try {
+      const weatherResponse = await fetch(
+          `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${WEATHER_API_KEY}&units=metric&lang=en`
+      );
+
+      if (!weatherResponse.ok) throw new Error('Weather API request failed');
+
+      const data = await weatherResponse.json();
+      res.json(data);
+  } catch (error) {
+      console.error('Error fetching weather by city:', error.message);
+      res.status(500).json({ message: 'Unable to fetch weather information' });
+  }
+});
+
 
 // 错误处理中间件
 app.use((err, _req, res, _next) => {

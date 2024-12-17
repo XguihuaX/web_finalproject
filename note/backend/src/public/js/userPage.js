@@ -40,17 +40,54 @@ document.getElementById('sidebar-toggle').addEventListener('click', () => {
 // 天气查询功能
 document.getElementById('city-button').addEventListener('click', async () => {
     const city = document.getElementById('city-input').value.trim();
-    if (!city) return alert('please input the cityname！');
+    if (!city) return alert('Please input the city name!');
+
     try {
-        const response = await fetch(`https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=YOUR_API_KEY&units=metric`);
-        if (!response.ok) throw new Error('weather search failed！');
+        // Call the backend API
+        const response = await fetch(`/api/weather/city?city=${encodeURIComponent(city)}`);
+        if (!response.ok) throw new Error('Weather search failed!');
+
         const data = await response.json();
-        document.getElementById('weather').textContent = `${data.name}: ${data.weather[0].description}, ${data.main.temp}°C`;
+        document.getElementById('weather').textContent = 
+            `${data.name}: ${data.weather[0].description}, ${data.main.temp}°C`;
     } catch (error) {
-        document.getElementById('weather').textContent = 'cannot get weather。';
+        document.getElementById('weather').textContent = 'Cannot get weather.';
         console.error(error);
     }
 });
+
+
+async function getWeatherByLocation(latitude, longitude) {
+    const weatherElement = document.getElementById('weather');
+    try {
+        // Call your backend route
+        const response = await fetch(
+            `/api/weather?latitude=${latitude}&longitude=${longitude}`
+        );
+
+        if (!response.ok) throw new Error('Weather query failed');
+
+        const data = await response.json();
+        weatherElement.textContent = `${data.name}: ${data.weather[0].description}, ${data.main.temp.toFixed(1)}°C`;
+    } catch (error) {
+        weatherElement.textContent = 'Unable to fetch weather information';
+        console.error('Error:', error.message);
+    }
+}
+
+function fetchWeatherUsingCurrentLocation() {
+    const weatherElement = document.getElementById('weather');
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+            (position) => {
+                const { latitude, longitude } = position.coords;
+                getWeatherByLocation(latitude, longitude);
+            },
+            () => getWeatherByLocation(40.4406, -79.9959) // Default to Pittsburgh
+        );
+    } else getWeatherByLocation(40.4406, -79.9959);
+}
+fetchWeatherUsingCurrentLocation();
 
 async function callLLMAPI(query) {
     const OPENAI_API_KEY = 'openai_Key';
