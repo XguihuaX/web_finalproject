@@ -17,11 +17,15 @@ document.getElementById('background-select').addEventListener('change', function
         'paper': '/public/images/basic_background.jpg',
         'custom1': '/public/images/default.png',
     };
-    const selectedBackground = backgrounds[e.target.value];
+
+    // 如果是上传的图片，直接使用选项值作为路径
+    const selectedBackground = backgrounds[e.target.value] || e.target.value;
+
     if (selectedBackground) {
         document.body.style.backgroundImage = `url('${selectedBackground}')`;
     }
 });
+
 
 document.getElementById('logout-button').addEventListener('click', () => {
     // 执行登出逻辑（例如清除本地存储中的 token）
@@ -147,6 +151,48 @@ document.getElementById('save-note-button').addEventListener('click', async () =
     }
 });
 
+async function renderNotes() {
+    const notesContainer = document.getElementById('notes-container');
+    if (!notesContainer) {
+        console.error('Error: #notes-container not found in the DOM');
+        return;
+    }
+
+    try {
+        const response = await fetch('/api/user/notes', {
+            method: 'GET',
+            headers: {
+                Authorization: `Bearer ${localStorage.getItem('token')}`,
+            },
+        });
+
+        if (!response.ok) throw new Error('Failed to fetch notes!');
+
+        const notes = await response.json();
+        console.log("Fetched Notes:", notes); // 输出调试数据
+
+        notesContainer.innerHTML = ''; // 清空之前的内容
+
+        notes.forEach(note => {
+            // 使用 noteId 代替 undefined
+            const noteId = note.noteId || 'Unknown ID';
+            const noteText = note.context || 'No Content';
+
+            const noteElement = document.createElement('div');
+            noteElement.classList.add('note');
+            noteElement.textContent = `${noteId}: ${noteText}`; // 显示 ID 和内容
+            notesContainer.appendChild(noteElement);
+        });
+    } catch (error) {
+        console.error('Error fetching notes:', error);
+        alert(`Error: ${error.message}`);
+    }
+}
+
+
+
+
+
 // 删除笔记功能
 document.getElementById('delete-note-button').addEventListener('click', async () => {
     const noteId = document.getElementById('delete-note-id').value.trim();
@@ -199,10 +245,11 @@ dropZone.addEventListener('click', () => {
     });
 });
 
-// 上传图片功能
+
 async function uploadImage(file) {
     const formData = new FormData();
     formData.append('image', file);
+
     try {
         const response = await fetch('/api/user/images', {
             method: 'POST',
@@ -211,14 +258,122 @@ async function uploadImage(file) {
             },
             body: formData,
         });
-        if (!response.ok) throw new Error('image upload failed！');
-        alert('iamge upload success！');
-        toggleModal('add-image-modal', 'add');
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.message || 'Image upload failed!');
+        }
+
+        const result = await response.json(); // 获取返回的图片信息
+        console.log('Uploaded Image Info:', result);
+
+        // 显示上传的图片
+        displayUploadedImage(result.imageUrl);
+        alert('Image uploaded successfully!');
+        toggleModal('add-image-modal', 'add'); // 关闭模态框
     } catch (error) {
-        alert(`error：${error.message}`);
-        console.error(error);
+        alert(`Error: ${error.message}`);
+        console.error('Image upload error:', error);
     }
 }
+
+// 显示上传的图片到 notes-container 下方
+function displayUploadedImage(imageUrl) {
+    const notesContainer = document.getElementById('notes-container');
+    if (!notesContainer) {
+        console.error('Error: #notes-container not found in the DOM');
+        return;
+    }
+
+    // 创建图片元素
+    const imgElement = document.createElement('img');
+    imgElement.src = imageUrl; // 使用服务器返回的 imageUrl
+    imgElement.alt = 'Uploaded Image';
+    imgElement.style.maxWidth = '300px';
+    imgElement.style.marginTop = '10px';
+    imgElement.style.border = '1px solid #ccc';
+    imgElement.style.borderRadius = '5px';
+    imgElement.style.boxShadow = '0 2px 4px rgba(0, 0, 0, 0.2)';
+
+    // 将图片添加到 notes-container 中
+    notesContainer.appendChild(imgElement);
+}
+
+
+async function fetchAndDisplayImages() {
+    const notesContainer = document.getElementById('notes-container');
+    if (!notesContainer) {
+        console.error('Error: #notes-container not found in the DOM');
+        return;
+    }
+
+    try {
+        const response = await fetch('/api/user/images', {
+            method: 'GET',
+            headers: {
+                Authorization: `Bearer ${localStorage.getItem('token')}`,
+            },
+        });
+
+        if (!response.ok) throw new Error('Failed to fetch images!');
+
+        const images = await response.json();
+        console.log('Fetched Images:', images);
+
+        // 清空之前的内容
+        notesContainer.innerHTML = '';
+
+        // 遍历图片列表，显示图片
+        images.forEach(image => {
+            const imgElement = document.createElement('img');
+            imgElement.src = image.imageUrl;
+            imgElement.alt = `Image ID: ${image.imageId}`;
+            imgElement.style.maxWidth = '300px';
+            imgElement.style.marginTop = '10px';
+            imgElement.style.border = '1px solid #ccc';
+            imgElement.style.borderRadius = '5px';
+            imgElement.style.boxShadow = '0 2px 4px rgba(0, 0, 0, 0.2)';
+            notesContainer.appendChild(imgElement);
+        });
+    } catch (error) {
+        console.error('Error fetching images:', error);
+        alert(`Error: ${error.message}`);
+    }
+}
+
+
+
+// 动态添加背景选项
+function addBackgroundOption(imagePath) {
+    const backgroundSelect = document.getElementById('background-select');
+
+    const newOption = document.createElement('option');
+    newOption.value = imagePath; // 使用文件路径作为选项值
+    newOption.textContent = `Custom Background (${backgroundSelect.options.length - 2})`; // 设置显示名称
+    backgroundSelect.appendChild(newOption);
+}
+
+
+// 文件选择功能
+const fileInput = document.getElementById('image-upload');
+let selectedFile = null;
+
+fileInput.addEventListener('change', (e) => {
+    selectedFile = e.target.files[0]; // 保存用户选择的文件
+    if (selectedFile) {
+        console.log('Selected file:', selectedFile);
+        alert(`File selected: ${selectedFile.name}`);
+    }
+});
+
+// 上传按钮点击事件
+document.getElementById('upload-image-button').addEventListener('click', () => {
+    if (selectedFile) {
+        uploadImage(selectedFile); // 调用上传函数
+    } else {
+        alert('Please select a file before uploading!');
+    }
+});
 
 // 删除图片功能
 document.getElementById('delete-image-button').addEventListener('click', async () => {
