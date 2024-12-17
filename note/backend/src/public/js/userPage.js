@@ -35,11 +35,7 @@ document.getElementById('city-button').addEventListener('click', async () => {
     if (!city) return alert('请输入城市名称！');
     try {
         const response = await fetch(`https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=YOUR_API_KEY&units=metric`);
-        //show error details
-        if (!response.ok) {
-            const errorData = await response.json();
-            throw new Error(errorData.message);
-        }
+        if (!response.ok) throw new Error('天气查询失败！');
         const data = await response.json();
         document.getElementById('weather').textContent = `${data.name}: ${data.weather[0].description}, ${data.main.temp}°C`;
     } catch (error) {
@@ -47,6 +43,29 @@ document.getElementById('city-button').addEventListener('click', async () => {
         console.error(error);
     }
 });
+
+async function callLLMAPI(query) {
+    const OPENAI_API_KEY = 'openai_Key';
+    try {
+        const response = await fetch('https://api.openai.com/v1/chat/completions', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${OPENAI_API_KEY}`,
+            },
+            body: JSON.stringify({
+                model: 'gpt-4o-mini',
+                messages: [{ role: 'user', content: query }],
+            }),
+        });
+        if (!response.ok) throw new Error('LLM API call failed');
+        const data = await response.json();
+        return data.choices[0].message.content;
+    } catch (error) {
+        console.error(error);
+        return 'Sorry, API request failed. Please try again later.';
+    }
+}
 
 // 模态框显示/隐藏功能
 function toggleModal(modalId, action) {
@@ -71,7 +90,6 @@ document.getElementById('save-note-button').addEventListener('click', async () =
             body: JSON.stringify({ context: noteText }),
         });
         if (!response.ok) throw new Error('添加笔记失败！');
-        else console.log(response);
         alert('笔记添加成功！');
         document.getElementById('note-text').value = '';
         toggleModal('note-modal', 'add');
@@ -86,7 +104,7 @@ document.getElementById('delete-note-button').addEventListener('click', async ()
     const noteId = document.getElementById('delete-note-id').value.trim();
     if (!noteId) return alert('请输入要删除的笔记ID！');
     try {
-        const response = await fetch(`/api/notes/${noteId}`, {
+        const response = await fetch(`/api/user/notes/${noteId}`, {
             method: 'DELETE',
             headers: {
                 Authorization: `Bearer ${localStorage.getItem('token')}`,
