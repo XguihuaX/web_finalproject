@@ -4,7 +4,7 @@ function updateTime() {
     const now = new Date();
     const hours = now.getHours().toString().padStart(2, '0');
     const minutes = now.getMinutes().toString().padStart(2, '0');
-    const month = now.toLocaleString('zh-US', { month: 'long' });
+    const month = now.toLocaleString('en-US', { month: 'long' });
     const day = now.getDate();
     timeElement.textContent = `${hours}:${minutes} - ${month} ${day}`;
 }
