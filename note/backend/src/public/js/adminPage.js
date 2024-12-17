@@ -31,20 +31,24 @@ document.getElementById('background-select').addEventListener('change', function
 /** ==============================
  *  3. 天气查询功能
  ============================== */
-async function getWeatherByLocation(latitude, longitude) {
-    const apiKey = 'f8f0f918c0c7695dbae5f4c687a1de14';
+ async function getWeatherByLocation(latitude, longitude) {
     const weatherElement = document.getElementById('weather');
     try {
+        // Call your backend route
         const response = await fetch(
-            `https://api.openweathermap.org/data/2.5/weather?lat=${latitude}&lon=${longitude}&appid=${apiKey}&units=metric&lang=en`
+            `/api/weather?latitude=${latitude}&longitude=${longitude}`
         );
+
         if (!response.ok) throw new Error('Weather query failed');
+
         const data = await response.json();
         weatherElement.textContent = `${data.name}: ${data.weather[0].description}, ${data.main.temp.toFixed(1)}°C`;
     } catch (error) {
         weatherElement.textContent = 'Unable to fetch weather information';
+        console.error('Error:', error.message);
     }
 }
+
 
 function fetchWeatherUsingCurrentLocation() {
     const weatherElement = document.getElementById('weather');
