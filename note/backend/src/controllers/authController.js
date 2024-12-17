@@ -2,9 +2,9 @@ const User = require("../models/user.js");
 const jwtUtils = require("../utils/jwt.js");
 
 tolowerCase = (status) => {
-  if (status === "User"){
+  if (status === "User" || status === "user"){
     return "user";
-  } else if (status === "Administrator"){
+  } else if (status === "Administrator"|| status === "admin"){
     return "admin";
   } else {
     return null;
@@ -15,8 +15,9 @@ exports.register = async (req, res) => {
     let { username, password, status } = req.body;
     console.log(req.body);
     status = tolowerCase(status);
-    if (!status in ["user", "admin"]){
-      return res.status(400).json({ message: "无效的用户状态" });
+
+    if (!["user", "admin"].includes(status)) {
+      return res.status(400).json({ message: "无效的用户状态" + status });
     }
 
     // 检查必填字段
@@ -44,8 +45,10 @@ exports.register = async (req, res) => {
       username: savedUser.username,
       status: savedUser.status,
     };
+    console.log("register user:", userResponse);
 
-    res.status(201).json(userResponse);
+    // res.status(201).json(userResponse);
+    res.redirect("/auth/login");
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
@@ -71,16 +74,24 @@ exports.login = async (req, res) => {
     }
 
     const token = jwtUtils.generateToken(user);
-
+    console.log(user);
     // 返回用户信息和token
-    res.json({
-      token,
-      user: {
-        userId: user.userId,
-        username: user.username,
-        status: user.status,
-      },
-    });
+    // res.json({
+    //   token,
+    //   user: {
+    //     userId: user.userId,
+    //     username: user.username,
+    //     status: user.status,
+    //   },
+    // });
+
+    if( user.status === "user")
+      res.redirect("/user/userpage");
+    else if (user.status === "admin")
+      res.redirect("/user/adminpage");
+    else
+      res.status(400).json({ message: "无效的用户状态" });
+
   } catch (err) {
     res.status(500).json({ message: err.message });
   }

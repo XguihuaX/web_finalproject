@@ -20,15 +20,20 @@ exports.verifyToken = (token) => {
 // 普通token验证中间件
 exports.verifyUserToken = (req, res, next) => {
   try {
+    
     const token = req.headers.authorization?.split(" ")[1];
+    console.log("Authorization header:", req.headers.authorization);
+    console.log("Token:", token);
     if (!token) {
       return res.status(401).json({ message: "未提供token" });
     }
 
     const decoded = jwt.verify(token, secretKey);
+    console.log("Decoded token:", decoded); // Log decoded token
     req.user = decoded;
     next();
   } catch (_err) {
+    console.log("Error verifying token:", _err);
     return res.status(401).json({ message: "无效的token" });
   }
 };

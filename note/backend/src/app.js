@@ -7,7 +7,7 @@ const cors = require("cors");
 const adminRoutes = require("./routes/adminRoute.js"); // 管理员相关API
 const indexRoutes = require("./routes/indexRoutes.js"); // 前端页面的路由
 const authPageRoutes = require("./routes/authPage.js"); // 前端认证页面路由
-const userPageRoutes = require("./routes/userPage.js"); // 前端用户页面路由
+const userPageRoutes = require("./routes/userRoutes.js"); // 前端用户页面路由
 const adminPageRoutes = require("./routes/adminPage.js"); // 前端管理员页面路由
 
 // 初始化 Express 应用

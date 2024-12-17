@@ -5,55 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Register</title>
     <link rel="stylesheet" href="/public/css/register.css">
-    <script>
-        async function handleRegister(event) {
-            event.preventDefault(); // Prevent the form from reloading the page
-
-            const username = document.getElementById("username").value;
-            const password = document.getElementById("password").value;
-            const status = document.getElementById("status").value;
-
-            try {
-                // Send the registration request to the backend
-                const response = await fetch("/api/auth/register", {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                    },
-                    body: JSON.stringify({ username, password, status }),
-                });
-
-                if (response.ok) {
-                    // Registration successful
-                    window.location.href = "/user/userpage"; // Redirect to the user page
-                } else {
-                    // Registration failed, show error message
-                    const errorData = await response.json();
-                    alert(`Registration failed: ${errorData.message}`);
-                }
-            } catch (error) {
-                // Handle network or unexpected errors
-                console.error("An error occurred:", error);
-                alert("An unexpected error occurred. Please try again later.");
-            }
-        }
-
-        // Toggle mute functionality for the background video
-        function toggleMute() {
-            const video = document.querySelector(".background-video");
-            const muteButton = document.querySelector(".mute-button i");
-
-            if (video.muted) {
-                video.muted = false;
-                muteButton.classList.remove("fa-volume-mute");
-                muteButton.classList.add("fa-volume-up");
-            } else {
-                video.muted = true;
-                muteButton.classList.remove("fa-volume-up");
-                muteButton.classList.add("fa-volume-mute");
-            }
-        }
-    </script>
 </head>
 <body>
     <div class="background-container">
@@ -64,12 +15,12 @@
 
         <div class="form-container">
             <h2>Register</h2> 
-            <form id="registerForm" onsubmit="handleRegister(event)">
+            <form action="/auth/register" method="POST">
                 <input type="text" id="username" name="username" placeholder="Enter your username" required>
                 <input type="password" id="password" name="password" placeholder="Enter your password" required>
                 <select id="status" name="status" required>
                     <option value="user" selected>User</option>
-                    <option value="admin">Administrator</option>
+                    <option value="admin" selected>Administrator</option>
                 </select>
                 <button type="submit" class="btn">Register</button>
             </form>
